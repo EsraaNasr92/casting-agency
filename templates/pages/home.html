@@ -1,1 +1,31 @@
-testing
+{% extends 'layouts/main.html' %}
+{% block title %}Casting Agency{% endblock %}
+{% block content %}
+<div class="slider">
+  <header class="masthead text-center text-white">
+    <div class="masthead-content">
+      <div class="container">
+        <h1 class="masthead-heading mb-0">Casting Agency</h1>
+        <h2 class="masthead-subheading mb-0">The Casting Agency is responsible for creating movies and
+          managing and assigning actors to those movies. </h2>
+      </div>
+    </div>
+    <div class="bg-circle-1 bg-circle"></div>
+    <div class="bg-circle-2 bg-circle"></div>
+    <div class="bg-circle-3 bg-circle"></div>
+    <div class="bg-circle-4 bg-circle"></div>
+  </header>
+</div>
+<div class="row">
+	<div class="col-sm-6">
+		<h3>
+			<a href="/movie"><button class="btn btn-primary btn-lg">Find a movie</button></a>
+			<a href="/movie/create"><button class="btn btn-default btn-lg">Create a movie</button></a>
+		</h3>
+    <h3>
+			<a href="/actors"><button class="btn btn-primary btn-lg">Find an actor</button></a>
+			<a href="/actors/create"><button class="btn btn-default btn-lg">Post an actor</button></a>
+		</h3>
+	</div>
+</div>
+{% endblock %}
