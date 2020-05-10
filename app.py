@@ -51,7 +51,9 @@ def index():
 def movies():
     return render_template('pages/movies.html')
 
-
+@app.route('/actors')
+def actors():
+    return render_template('pages/actors.html')
 #----------------------------------------------------------------------------#
 # Launch.
 #----------------------------------------------------------------------------#
