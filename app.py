@@ -28,10 +28,6 @@ db = SQLAlchemy(app)
 #----------------------------------------------------------------------------#
 
 
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate
-
-# TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
-
 #----------------------------------------------------------------------------#
 # Filters.
 #----------------------------------------------------------------------------#
@@ -51,9 +47,24 @@ def index():
 def movies():
     return render_template('pages/movies.html')
 
+
 @app.route('/actors')
 def actors():
     return render_template('pages/actors.html')
+
+
+#  Create Movie
+#  ----------------------------------------------------------------
+@app.route('/movies/create', methods=['GET'])
+def create_movie_form():
+    form = MovieForm()
+    return render_template('forms/new_movie.html', form=form)
+
+
+@app.route('/movies/create', methods=['POST'])
+def create_movie_submission():
+    return "create movie"
+
 #----------------------------------------------------------------------------#
 # Launch.
 #----------------------------------------------------------------------------#
