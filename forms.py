@@ -6,8 +6,11 @@ from wtforms.validators import DataRequired, AnyOf, URL
 
 
 class MovieForm(Form):
-    name = StringField(
-        'name', validators=[DataRequired()]
+    title = StringField(
+        'title', validators=[DataRequired()]
+    )
+    release_date = StringField(
+        'release_date', validators=[DataRequired()]
     )
 
 
@@ -15,7 +18,9 @@ class ActorsForm(Form):
     name = StringField(
         'name', validators=[DataRequired()]
     )
-
+    age = StringField(
+        'age', validators=[DataRequired()]
+    )
     gender = SelectField(
         'gender', validators=[DataRequired()],
         choices=[

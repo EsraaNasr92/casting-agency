@@ -12,7 +12,7 @@ import logging
 from logging import Formatter, FileHandler
 from flask_wtf import Form
 from forms import *
-from sqlalchemy import Column, String, Integer, Boolean, DateTime, ARRAY, ForeignKey
+from sqlalchemy import Column, String, Integer, Boolean, DateTime, ARRAY, ForeignKey, Text
 from sqlalchemy.exc import SQLAlchemyError
 
 #----------------------------------------------------------------------------#
@@ -45,9 +45,9 @@ class Actors(db.Model):
     __tablename__ = 'actor'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
-    age = db.Column(db.Integer)
-    gender = db.Column(ARRAY(String))
+    name = db.Column(db.String(), nullable=False)
+    age = db.Column(db.Integer(), nullable=False)
+    gender = db.Column(Text(), nullable=False)
 
     def __init__(self, name, age, gender):
         self.name= name
@@ -90,7 +90,21 @@ def create_movie_form():
 
 @app.route('/movies/create', methods=['POST'])
 def create_movie_submission():
-    return "create movie"
+    try:
+        New_movie = Movie(
+        title=request.form['title'],
+        release_date=request.form['release_date']
+        )
+        #insert new venue records into the db
+        db.session.add(New_movie)
+        db.session.commit()
+
+        # on successful db insert, flash success
+        flash('Movie ' + request.form['title'] + ' was successfully listed!')
+    except SQLAlchemyError as e:
+        # TODO: on unsuccessful db insert, flash an error instead
+        flash('An error occurred. Movie ' + request.form['title'] + ' could not be listed.')
+    return render_template('pages/home.html')
 
 
 #  Create Actors
@@ -103,7 +117,25 @@ def create_actors_form():
 
 @app.route('/actors/create', methods=['POST'])
 def create_actors_submission():
-        return "Create Actor"
+    try:
+        New_actor= Actors(
+        name=request.form['name'],
+        age=request.form['age'],
+        gender=request.form['gender']
+        )
+        #insert new venue records into the db
+        db.session.add(New_actor)
+        db.session.commit()
+
+        # on successful db insert, flash success
+        flash('Actor ' + request.form['name'] + ' was successfully listed!')
+    except SQLAlchemyError as e:
+        # TODO: on unsuccessful db insert, flash an error instead
+        flash('An error occurred. Actor ' + request.form['name'] + ' could not be listed.')
+    return render_template('pages/home.html')
+
+
+
 #----------------------------------------------------------------------------#
 # Launch.
 #----------------------------------------------------------------------------#
