@@ -11,9 +11,24 @@
 				<h5>{{ actor.name }}</h5>
 			</div>
 		</a>
+		<button id = "delete_button" data-id = "{{actor.id}}">  &cross; </button>
 
 	</li>
 	{% endfor %}
 </ul>
 
+<script type="text/javascript">
+	const delete_button = document.getElementById('delete_button');
+	delete_button.onclick = function (e) {
+	const actor_id = e.target.dataset['id'];
+	fetch('/actor/' + actor_id, {
+		method: "DELETE"
+	})
+	.then(function() {
+		window.location.href = '/actors';
+	})
+	.catch(function(e) {
+		console.log('error', e)
+	})
+}</script>
 {% endblock %}

@@ -141,7 +141,7 @@ def create_actors_submission():
 #  ----------------------------------------------------------------
 
 @app.route('/movies/<movie_id>', methods=['DELETE'])
-def delete_venue(movie_id):
+def delete_movie(movie_id):
 	try:
 		movie = Movie.query.get(movie_id)
 		db.session.delete(movie)
@@ -150,6 +150,18 @@ def delete_venue(movie_id):
 		flash('error occur')
 	return render_template('pages/home.html')
 
+#  Delete Actor
+#  ----------------------------------------------------------------
+
+@app.route('/actor/<actor_id>', methods=['DELETE'])
+def delete_actor(actor_id):
+	try:
+		actor = Actors.query.get(actor_id)
+		db.session.delete(actor)
+		db.session.commit()
+	except SQLAlchemyError as e:
+		flash('error occur')
+	return render_template('pages/home.html')
 #----------------------------------------------------------------------------#
 # Launch.
 #----------------------------------------------------------------------------#
