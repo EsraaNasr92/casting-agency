@@ -11,9 +11,16 @@ class MovieForm(Form):
     )
 
 
-
 class ActorsForm(Form):
     name = StringField(
         'name', validators=[DataRequired()]
+    )
+
+    gender = SelectField(
+        'gender', validators=[DataRequired()],
+        choices=[
+            ('Male'),
+            ('Female'),
+    ]
     )
 # TODO IMPLEMENT NEW Movie FORM AND NEW Actors

@@ -65,6 +65,18 @@ def create_movie_form():
 def create_movie_submission():
     return "create movie"
 
+
+#  Create Actors
+#  ----------------------------------------------------------------
+
+@app.route('/actors/create', methods=['GET'])
+def create_actors_form():
+		form = ActorsForm()
+		return render_template('forms/new_actors.html', form=form)
+
+@app.route('/actors/create', methods=['POST'])
+def create_actors_submission():
+        return "Create Actor"
 #----------------------------------------------------------------------------#
 # Launch.
 #----------------------------------------------------------------------------#
