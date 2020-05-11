@@ -72,12 +72,14 @@ def index():
 
 @app.route('/movies')
 def movies():
-    return render_template('pages/movies.html')
+    data = Movie.query.all();
+    return render_template('pages/movies.html', movies=data)
 
 
 @app.route('/actors')
 def actors():
-    return render_template('pages/actors.html')
+    data = Actors.query.all();
+    return render_template('pages/actors.html', actors=data)
 
 
 #  Create Movie
