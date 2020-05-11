@@ -5,15 +5,27 @@
 	<ul class="items">
 		{% for movie in movies %}
 		<li class="col-sm-3">
-			<a href="/movies/">
 				<i class="fas fa-film"></i>
 				<div class="item">
 					<h4>{{ movie.title }}</h4>
 					<h5>{{ movie.release_date}}</h5>
 				</div>
-			</a>
+				<button id = "delete_button" data-id = "{{movie.id}}"> &cross; </button>
 		</li>
 		{% endfor %}
 	</ul>
 
+	<script type="text/javascript">const delete_button = document.getElementById('delete_button');
+	delete_button.onclick = function (e) {
+		const movie_id = e.target.dataset['id'];
+		fetch('/movies/' + movie_id, {
+			method: "DELETE"
+		})
+		.then(function() {
+			window.location.href = '/movies';
+		})
+		.catch(function(e) {
+			console.log('error', e)
+		})
+	}</script>
 {% endblock %}

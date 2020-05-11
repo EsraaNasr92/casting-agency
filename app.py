@@ -41,6 +41,7 @@ class Movie(db.Model):
         self.release_date= release_date
 
 
+
 class Actors(db.Model):
     __tablename__ = 'actor'
 
@@ -136,7 +137,18 @@ def create_actors_submission():
         flash('An error occurred. Actor ' + request.form['name'] + ' could not be listed.')
     return render_template('pages/home.html')
 
+#  Delete Movie
+#  ----------------------------------------------------------------
 
+@app.route('/movies/<movie_id>', methods=['DELETE'])
+def delete_venue(movie_id):
+	try:
+		movie = Movie.query.get(movie_id)
+		db.session.delete(movie)
+		db.session.commit()
+	except SQLAlchemyError as e:
+		flash('error occur')
+	return render_template('pages/home.html')
 
 #----------------------------------------------------------------------------#
 # Launch.
