@@ -55,6 +55,16 @@ class Actors(db.Model):
         self.age= age
         self.gender= gender
 
+    def details(self):
+        return{
+        'id':self.id,
+        'name':self.name,
+        'age':self.age,
+        'gender':self.gender
+    }
+    def update(self):
+        db.session.commit()
+
 db.create_all()
 #----------------------------------------------------------------------------#
 # Filters.
@@ -109,6 +119,20 @@ def create_movie_submission():
         flash('An error occurred. Movie ' + request.form['title'] + ' could not be listed.')
     return render_template('pages/home.html')
 
+#  Delete Movie
+#  ----------------------------------------------------------------
+
+@app.route('/movies/<movie_id>', methods=['DELETE'])
+def delete_movie(movie_id):
+	try:
+		movie = Movie.query.get(movie_id)
+		db.session.delete(movie)
+		db.session.commit()
+	except SQLAlchemyError as e:
+		flash('error occur')
+	return render_template('pages/home.html')
+
+
 
 #  Create Actors
 #  ----------------------------------------------------------------
@@ -126,29 +150,15 @@ def create_actors_submission():
         age=request.form['age'],
         gender=request.form['gender']
         )
-        #insert new venue records into the db
+
         db.session.add(New_actor)
         db.session.commit()
 
-        # on successful db insert, flash success
+
         flash('Actor ' + request.form['name'] + ' was successfully listed!')
     except SQLAlchemyError as e:
-        # TODO: on unsuccessful db insert, flash an error instead
         flash('An error occurred. Actor ' + request.form['name'] + ' could not be listed.')
     return render_template('pages/home.html')
-
-#  Delete Movie
-#  ----------------------------------------------------------------
-
-@app.route('/movies/<movie_id>', methods=['DELETE'])
-def delete_movie(movie_id):
-	try:
-		movie = Movie.query.get(movie_id)
-		db.session.delete(movie)
-		db.session.commit()
-	except SQLAlchemyError as e:
-		flash('error occur')
-	return render_template('pages/home.html')
 
 #  Delete Actor
 #  ----------------------------------------------------------------
@@ -162,6 +172,44 @@ def delete_actor(actor_id):
 	except SQLAlchemyError as e:
 		flash('error occur')
 	return render_template('pages/home.html')
+
+#  Edit Actor
+#  ----------------------------------------------------------------
+@app.route('/actors/<int:actor_id>/edit', methods=['GET'])
+def edit_actor(actor_id):
+		form = ActorsForm()
+		actor_data = Actors.query.get(actor_id)
+		if actor_data:
+			actor_details = Actors.details(actor_data)
+			form.name.data = actor_details['name']
+			form.age.data = actor_details['age']
+			form.gender.data = actor_details['gender']
+
+		return render_template('forms/edit_actor.html', form=form, actor=actor_details)
+
+@app.route('/actors/<int:actor_id>/edit', methods=['POST'])
+def edit_actor_submission(actor_id):
+
+    form = ActorsForm(request.form)
+    actor_data =Actors.query.get(actor_id)
+
+    try:
+        setattr(actor_data, 'name', request.form['name'])
+        setattr(actor_data, 'gender', request.form['gender'])
+        setattr(actor_data, 'age', request.form['age'])
+
+        Actors.update(actor_data)
+
+        # on successful db insert, flash success
+        flash('Actor ' + request.form['name'] + ' was successfully updated!')
+    except SQLAlchemyError as e:
+        # TODO: on unsuccessful db insert, flash an error instead
+        flash('An error occurred. Actor ' + request.form['name'] + ' could not be updated.')
+    return render_template('pages/home.html')
+
+
+
+
 #----------------------------------------------------------------------------#
 # Launch.
 #----------------------------------------------------------------------------#

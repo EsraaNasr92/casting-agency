@@ -5,15 +5,15 @@
 <ul class="items">
 	{% for actor in actors %}
 	<li class="col-sm-6">
-		<a href="/actors/{{ actor.id }}">
 			<i class="fas fa-star"></i>
 			<div class="item">
-				<h5>{{ actor.name }}</h5>
+				<h4>{{ actor.name }}</h4>
+				<h5>{{ actor.age }}</h5>
+				<h6>{{ actor.gender }}</h6>
 			</div>
-		</a>
-		<button id = "delete_button" data-id = "{{actor.id}}">  &cross; </button>
-
 	</li>
+		<button id = "delete_button" data-id = "{{actor.id}}">  Delete actor </button>
+		<button><a href="{{ url_for('edit_actor', actor_id=actor.id) }}">Edit actor</a></button>
 	{% endfor %}
 </ul>
 
