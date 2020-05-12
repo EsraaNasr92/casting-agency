@@ -40,7 +40,14 @@ class Movie(db.Model):
         self.title= title
         self.release_date= release_date
 
-
+    def details(self):
+        return{
+        'id':self.id,
+        'title':self.title,
+        'release_date':self.release_date,
+    }
+    def update(self):
+        db.session.commit()
 
 class Actors(db.Model):
     __tablename__ = 'actor'
@@ -132,7 +139,36 @@ def delete_movie(movie_id):
 		flash('error occur')
 	return render_template('pages/home.html')
 
+#  Edit Movie
+#  ----------------------------------------------------------------
+@app.route('/movies/<int:movie_id>/edit', methods=['GET'])
+def edit_movie(movie_id):
+		form = MovieForm()
+		movie_data = Movie.query.get(movie_id)
+		if movie_data:
+			movie_details = Movie.details(movie_data)
+			form.title.data = movie_details['title']
+			form.release_date.data = movie_details['release_date']
 
+		return render_template('forms/edit_movie.html', form=form, movie=movie_details)
+
+@app.route('/movies/<int:movie_id>/edit', methods=['POST'])
+def edit_movie_submission(movie_id):
+
+    form = MovieForm(request.form)
+    movie_data =Movie.query.get(movie_id)
+
+    try:
+        setattr(movie_data, 'title', request.form['title'])
+        setattr(movie_data, 'release_date', request.form['release_date'])
+
+        Movie.update(movie_data)
+
+        flash('Movie ' + request.form['title'] + ' was successfully updated!')
+    except SQLAlchemyError as e:
+
+        flash('An error occurred. Movie ' + request.form['title'] + ' could not be updated.')
+    return render_template('pages/home.html')
 
 #  Create Actors
 #  ----------------------------------------------------------------

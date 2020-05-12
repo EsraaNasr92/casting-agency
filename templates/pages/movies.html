@@ -10,7 +10,8 @@
 					<h4>{{ movie.title }}</h4>
 					<h5>{{ movie.release_date}}</h5>
 				</div>
-				<button id = "delete_button" data-id = "{{movie.id}}"> &cross; </button>
+				<button id = "delete_button" data-id = "{{movie.id}}"> Delete movie </button>
+				<button><a href="{{ url_for('edit_movie', movie_id=movie.id) }}">Edit movie</a></button>
 		</li>
 		{% endfor %}
 	</ul>
