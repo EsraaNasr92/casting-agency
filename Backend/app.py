@@ -55,7 +55,12 @@ class Movie(db.Model):
         'title': self.title,
         'release_date': self.release_date,
     }
-
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+    def insert(self):
+        db.session.add(self)
+        db.session.commit()
 
 class Actors(db.Model):
     __tablename__ = 'actor'
@@ -87,6 +92,14 @@ class Actors(db.Model):
         'age':self.age,
         'gender': self.gender
     }
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
+    def insert(self):
+        db.session.add(self)
+        db.session.commit()
+
 db.create_all()
 #----------------------------------------------------------------------------#
 # Filters.
@@ -114,8 +127,7 @@ def movies():
         })
     except:
         abort(422)
-    #data = Movie.query.all();
-    #return render_template('pages/movies.html', movies=data)
+
 
 
 @app.route('/actors')
@@ -129,8 +141,6 @@ def actors():
         })
     except:
         abort(422)
-    #data = Actors.query.all();
-    #return render_template('pages/actors.html', actors=data)
 
 
 #  Create Movie
@@ -141,36 +151,78 @@ def create_movie_form():
     return render_template('forms/new_movie.html', form=form)
 
 
-@app.route('/movies/create', methods=['POST'])
-def create_movie_submission():
+@app.route('/movies', methods=['POST'])
+def add_new_movie():
+    title = request.get_json().get('title')
+    release_date = request.get_json().get('release_date')
     try:
-        New_movie = Movie(
-        title=request.form['title'],
-        release_date=request.form['release_date']
-        )
-        #insert new venue records into the db
-        db.session.add(New_movie)
-        db.session.commit()
+        data = title and release_date
+        if not data:
+            abort(400)
+    except (TypeError, KeyError):
+        abort(400)
 
-        # on successful db insert, flash success
-        flash('Movie ' + request.form['title'] + ' was successfully listed!')
-    except SQLAlchemyError as e:
-        # TODO: on unsuccessful db insert, flash an error instead
-        flash('An error occurred. Movie ' + request.form['title'] + ' could not be listed.')
-    return render_template('pages/home.html')
+    try:
+        Movie(title=title, release_date=release_date).insert()
+        return jsonify({
+            'success': True,
+            'movie': title
+        }), 201
+    except:
+        abort(422)
+
+# Update Movies
+# -----------------------------------------------------------------
+
+@app.route('/movies/<int:movie_id>', methods=['PATCH'])
+def update_movie(movie_id):
+    title = request.get_json().get('title')
+    release_date = request.get_json().get('release_date')
+
+
+    try:
+        data = title or release_date
+        if not data:
+            abort(400)
+    except (TypeError, KeyError):
+        abort(400)
+
+
+    movie = Movie.query.filter_by(id=movie_id).first()
+    if not movie:
+        abort(404)
+
+
+    try:
+        if title:
+            movie.title = title
+        if release_date:
+            movie.release_date = release_date
+        movie.update()
+        return jsonify({
+            'success': True,
+            'movie': movie.format()
+        }), 200
+    except Exception:
+        abort(422)
 
 #  Delete Movie
 #  ----------------------------------------------------------------
 
-@app.route('/movies/<movie_id>', methods=['DELETE'])
+@app.route('/movies/<int:movie_id>', methods=['DELETE'])
 def delete_movie(movie_id):
-	try:
-		movie = Movie.query.get(movie_id)
-		db.session.delete(movie)
-		db.session.commit()
-	except SQLAlchemyError as e:
-		flash('error occur')
-	return render_template('pages/home.html')
+    movie = Movie.query.filter_by(id=movie_id).first()
+    if not movie:
+        abort(404)
+
+    try:
+        movie.delete()
+        return jsonify({
+            'success': True,
+            'delete': movie_id
+        }), 200
+    except Exception:
+        abort(422)
 
 #  Edit Movie
 #  ----------------------------------------------------------------
@@ -211,36 +263,44 @@ def create_actors_form():
 		form = ActorsForm()
 		return render_template('forms/new_actors.html', form=form)
 
-@app.route('/actors/create', methods=['POST'])
-def create_actors_submission():
+@app.route('/actors', methods=['POST'])
+def add_actor():
+    name = request.get_json().get('name')
+    gender = request.get_json().get('gender')
+    age = request.get_json().get('age')
     try:
-        New_actor= Actors(
-        name=request.form['name'],
-        age=request.form['age'],
-        gender=request.form['gender']
-        )
+        data = name and gender and age
+        if not data:
+            abort(400)
+    except (TypeError, KeyError):
+        abort(400)
 
-        db.session.add(New_actor)
-        db.session.commit()
-
-
-        flash('Actor ' + request.form['name'] + ' was successfully listed!')
-    except SQLAlchemyError as e:
-        flash('An error occurred. Actor ' + request.form['name'] + ' could not be listed.')
-    return render_template('pages/home.html')
+    try:
+        Actors(name=name, gender=gender, age=age).insert()
+        return jsonify({
+            'success': True,
+            'actor': name
+        }), 201
+    except:
+        abort(422)
 
 #  Delete Actor
 #  ----------------------------------------------------------------
 
-@app.route('/actor/<actor_id>', methods=['DELETE'])
+@app.route('/actors/<int:actor_id>', methods=['DELETE'])
 def delete_actor(actor_id):
-	try:
-		actor = Actors.query.get(actor_id)
-		db.session.delete(actor)
-		db.session.commit()
-	except SQLAlchemyError as e:
-		flash('error occur')
-	return render_template('pages/home.html')
+    actor = Actor.query.filter_by(id=actor_id).first()
+    if not actor:
+        abort(404)
+
+    try:
+        actor.delete()
+        return jsonify({
+            'success': True,
+            'delete': actor_id
+        }), 200
+    except Exception:
+        abort(422)
 
 #  Edit Actor
 #  ----------------------------------------------------------------
@@ -276,7 +336,41 @@ def edit_actor_submission(actor_id):
         flash('An error occurred. Actor ' + request.form['name'] + ' could not be updated.')
     return render_template('pages/home.html')
 
+# Update Actors
+#---------------------------------------------------------------------------
+@app.route('/actors/<int:actor_id>', methods=['PATCH'])
+def update_actor(actor_id):
+    name = request.get_json().get('name')
+    age = request.get_json().get('age')
+    gender = request.get_json().get('gender')
 
+    try:
+        data = name or gender or age
+        if not data:
+            abort(400)
+    except (TypeError, KeyError):
+        abort(400)
+
+
+    actor = Actors.query.filter_by(id=actor_id).first()
+    if not actor:
+        abort(404)
+
+    # update
+    try:
+        if name:
+            actor.name = name
+        if gender:
+            actor.gender = gender
+        if age:
+            actor.age = age
+        actor.update()
+        return jsonify({
+            'success': True,
+            'actor': actor.format()
+        }), 200
+    except Exception:
+        abort(422)
 
 @app.errorhandler(422)
 def unprocessable(error):
