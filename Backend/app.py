@@ -171,7 +171,7 @@ def add_new_movie():
         return jsonify({
             'success': True,
             'movie': title
-        }), 201
+        }), 200
     except:
         abort(422)
 
@@ -267,6 +267,7 @@ def create_actors_form():
 		form = ActorsForm()
 		return render_template('forms/new_actors.html', form=form)
 
+
 @app.route('/actors', methods=['POST'])
 def add_actor():
     name = request.get_json().get('name')
@@ -293,7 +294,7 @@ def add_actor():
 
 @app.route('/actors/<int:actor_id>', methods=['DELETE'])
 def delete_actor(actor_id):
-    actor = Actor.query.filter_by(id=actor_id).first()
+    actor = Actors.query.filter_by(id=actor_id).first()
     if not actor:
         abort(404)
 
