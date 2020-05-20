@@ -14,17 +14,21 @@ from flask_wtf import Form
 from forms import *
 from sqlalchemy import Column, String, Integer, Boolean, DateTime, ARRAY, ForeignKey, Text
 from sqlalchemy.exc import SQLAlchemyError
+from flask_cors import CORS
 
 #----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
 
 app = Flask(__name__)
+CORS(app)
 moment = Moment(app)
 app.config.from_object('config')
 db = SQLAlchemy(app)
 
 # TODO: connect to a local postgresql database
+
+
 
 #----------------------------------------------------------------------------#
 # Models.
