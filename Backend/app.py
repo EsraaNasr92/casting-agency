@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 import json
 from flask_cors import CORS
 from models import setup_db, Actors, Movie
-
+from auth import AuthError, requires_auth
 
 
 DEFAULT_OFFSET = 1
@@ -35,7 +35,8 @@ def create_app(test_config=None):
   """
 
   @app.route('/actors')
-  def get_actors():
+  @requires_auth('get:actors')
+  def get_actors(jwt):
     try:
       return jsonify({
         'success': True,
@@ -47,7 +48,8 @@ def create_app(test_config=None):
 
 
   @app.route('/movies')
-  def get_movies():
+  @requires_auth('get:movie')
+  def get_movies(jwt):
     return jsonify({
       'success': True,
       'movies': paginate_response(request, Movie.query.order_by(Movie.id).all())
@@ -58,9 +60,10 @@ def create_app(test_config=None):
   """
 
   @app.route('/movies/<movie_id>', methods=['DELETE'])
-  def delete_movie(movie_id):
+  @requires_auth('delete:movie')
+  def delete_movie(jwt, movie_id):
     movie = Movie.query.get(movie_id)
-
+ 
     if movie is None:
       abort(404)
 
@@ -73,7 +76,8 @@ def create_app(test_config=None):
 
 
   @app.route('/actors/<actor_id>', methods=['DELETE'])
-  def delete_actor(actor_id):
+  @requires_auth('delete:actor')
+  def delete_actor(jwt, actor_id):
     actor = Actor.query.get(actor_id)
 
     if actor is None:
@@ -91,7 +95,8 @@ def create_app(test_config=None):
     POST new movie and actor
     """
   @app.route('/actors', methods=['POST'])
-  def add_new_actor():
+  @requires_auth('add:actor')
+  def add_new_actor(jwt):
     name = request.get_json().get('name')
     age = request.get_json().get('age')
     gender = request.get_json().get('gender')
@@ -113,7 +118,8 @@ def create_app(test_config=None):
       abort(422)
 
   @app.route('/movies', methods=['POST'])
-  def add_new_movie():
+  @requires_auth('add:movie')
+  def add_new_movie(jwt):
     title = request.get_json().get('title')
     release_date = request.get_json().get('release_date')
 
@@ -136,7 +142,8 @@ def create_app(test_config=None):
 
 
   @app.route('/actors/<actor_id>', methods=['PATCH'])
-  def update_actor(actor_id):
+  @requires_auth('update:actor')
+  def update_actor(jwt, actor_id):
     actor = Actors.query.get(actor_id)
 
     # Abort 404 if the actor was not found
@@ -167,7 +174,8 @@ def create_app(test_config=None):
 
 
   @app.route('/movies/<movie_id>', methods=['PATCH'])
-  def update_movie(movie_id):
+  @requires_auth('update:movie')
+  def update_movie(jwt, movie_id):
     movie = Movie.query.get(movie_id)
 
     # Abort 404 if the movie was not found
@@ -206,7 +214,7 @@ def create_app(test_config=None):
   @app.errorhandler(422)
   def unprocessable(error):
     return jsonify({
-      "success": False,
+      "success": False, 
       "error": 422,
       "message": "Unable to process your request. Please try again later."
     }), 422
@@ -215,7 +223,7 @@ def create_app(test_config=None):
   @app.errorhandler(404)
   def not_found_error(error):
     return jsonify({
-      "success": False,
+      "success": False, 
       "error": 404,
       "message": "Resource not found."
     }), 404
@@ -224,10 +232,19 @@ def create_app(test_config=None):
   @app.errorhandler(400)
   def bad_request(error):
     return jsonify({
-      "success": False,
+      "success": False, 
       "error": 400,
       "message": str(error)
     }), 400
+
+  @app.errorhandler(AuthError)
+  def auth_error(auth_error):
+    return jsonify({
+      "success": False,
+      "error": auth_error.status_code,
+      "message": auth_error.error['description']
+    }), auth_error.status_code
+
 
 
   return app

@@ -97,7 +97,7 @@ class CastingAgencyTestCase(unittest.TestCase):
 
   def test_delete_actors (self):
     self.client().post('/actors', json=self.new_actor)
-
+    
     res = self.client().delete('/actors/22')
     data = json.loads(res.data)
 
@@ -133,7 +133,7 @@ class CastingAgencyTestCase(unittest.TestCase):
 
     self.assertEqual(res.status_code, 401)
     self.assertFalse(data['success'])
-
+  
   def test_401_create_actors (self):
     res = self.client().post('/actors', json=self.new_actor)
     data = json.loads(res.data)
@@ -161,14 +161,14 @@ class CastingAgencyTestCase(unittest.TestCase):
 
     self.assertEqual(res.status_code, 404)
     self.assertFalse(data['success'])
-
+  
   def test_404_delete_actors (self):
     res = self.client().delete('/actors/1000')
     data = json.loads(res.data)
 
     self.assertEqual(res.status_code, 404)
     self.assertFalse(data['success'])
-
+  
   def test_404_delete_movies (self):
     res = self.client().delete('/movies/1000')
     data = json.loads(res.data)

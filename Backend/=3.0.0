@@ -1,9 +1,0 @@
-Collecting python-jose
-  Downloading python_jose-3.1.0-py2.py3-none-any.whl (26 kB)
-Requirement already satisfied: six<2.0 in /usr/lib/python3/dist-packages (from python-jose) (1.14.0)
-Collecting ecdsa<1.0
-  Downloading ecdsa-0.15-py2.py3-none-any.whl (100 kB)
-Requirement already satisfied: rsa in /home/esraa/.local/lib/python3.8/site-packages (from python-jose) (3.4.2)
-Requirement already satisfied: pyasn1 in /home/esraa/.local/lib/python3.8/site-packages (from python-jose) (0.4.8)
-Installing collected packages: ecdsa, python-jose
-Successfully installed ecdsa-0.15 python-jose-3.1.0
